@@ -47,3 +47,99 @@ The `testscript.sh` script demonstrates how to use the genToken API to retrieve 
 4. Check the output for any error messages or success messages indicating the file upload status.
 
 Note: Make sure to replace the placeholder values in the environment variables with your actual API endpoint, S3 bucket name, and file path.
+
+
+
+# C# Example
+
+https://docs.aws.amazon.com/AmazonS3/latest/userguide/upload-objects.html
+
+To upload a file to Amazon S3 using .NET Framework and AWS SDK, you can follow these steps:
+
+1. **Install AWS SDK for .NET**
+   If you haven't already installed the AWS SDK for .NET, you can install it using NuGet Package Manager. In Visual Studio, go to `Tools` > `NuGet Package Manager` > `Manage NuGet Packages for Solution`. Search for `AWSSDK.S3` and install the latest version.
+
+2. **Import Required Namespaces**
+   In your C# code file, add the following namespace imports:
+
+   ```csharp
+   using Amazon.S3;
+   using Amazon.S3.Transfer;
+   ```
+
+3. **Configure AWS Credentials**
+   You need to provide your AWS credentials (Access Key ID and Secret Access Key) to authenticate with AWS. You can do this in several ways, but for this example, we'll use the `BasicAWSCredentials` class:
+
+   ```csharp
+   var accessKeyId = "YOUR_AWS_ACCESS_KEY_ID";
+   var secretAccessKey = "YOUR_AWS_SECRET_ACCESS_KEY";
+   var credentials = new Amazon.Runtime.BasicAWSCredentials(accessKeyId, secretAccessKey);
+   ```
+
+4. **Create an S3 Client**
+   Create an instance of the `AmazonS3Client` class using the AWS credentials:
+
+   ```csharp
+   var s3Client = new AmazonS3Client(credentials, Amazon.RegionEndpoint.USEast1); // Replace with your desired AWS region
+   ```
+
+5. **Upload the File**
+   Use the `TransferUtility` class to upload the file to S3:
+
+   ```csharp
+   var fileTransferUtility = new TransferUtility(s3Client);
+   var filePath = @"C:\path\to\your\file.txt"; // Replace with the actual file path
+   var bucketName = "your-bucket-name"; // Replace with your S3 bucket name
+   var keyName = "folder/file.txt"; // Replace with the desired key (file path) in S3
+
+   var fileTransferUtilityRequest = new TransferUtilityUploadRequest
+   {
+       BucketName = bucketName,
+       Key = keyName,
+       FilePath = filePath
+   };
+
+   fileTransferUtility.Upload(fileTransferUtilityRequest);
+   ```
+
+   The `TransferUtility` class provides additional options and events for monitoring the upload progress and handling failures.
+
+Here's the complete code snippet:
+
+```csharp
+using Amazon.S3;
+using Amazon.S3.Transfer;
+
+namespace UploadFileToS3
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            var accessKeyId = "YOUR_AWS_ACCESS_KEY_ID";
+            var secretAccessKey = "YOUR_AWS_SECRET_ACCESS_KEY";
+            var credentials = new Amazon.Runtime.BasicAWSCredentials(accessKeyId, secretAccessKey);
+
+            var s3Client = new AmazonS3Client(credentials, Amazon.RegionEndpoint.USEast1);
+
+            var fileTransferUtility = new TransferUtility(s3Client);
+            var filePath = @"C:\path\to\your\file.txt";
+            var bucketName = "your-bucket-name";
+            var keyName = "folder/file.txt";
+
+            var fileTransferUtilityRequest = new TransferUtilityUploadRequest
+            {
+                BucketName = bucketName,
+                Key = keyName,
+                FilePath = filePath
+            };
+
+            fileTransferUtility.Upload(fileTransferUtilityRequest);
+        }
+    }
+}
+```
+
+Make sure to replace `YOUR_AWS_ACCESS_KEY_ID`, `YOUR_AWS_SECRET_ACCESS_KEY`, `filePath`, `bucketName`, and `keyName` with your actual values.
+
+Note: It's generally recommended to use more secure methods for storing and managing AWS credentials, such as environment variables, AWS credential files, or AWS Identity and Access Management (IAM) roles, instead of hardcoding them in your code.

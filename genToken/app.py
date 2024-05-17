@@ -37,7 +37,7 @@ def lambda_handler(event, context):
     # request_body = event.get('body')
     # pos_id = body_data.get('POS_ID')
 
-
+    # You can modify this part to control access base on branch detail
     federated_token = sts.get_federation_token(
         Name='POSID-XXXXXXXXXX',
         Policy=json.dumps({
