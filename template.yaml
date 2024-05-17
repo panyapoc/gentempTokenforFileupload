@@ -1,0 +1,93 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: |
+  genToken
+  Sample SAM Template for genToken
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 3
+    MemorySize: 128
+
+Resources:
+  GenTokenFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: GenToken/
+      Handler: app.lambda_handler
+      Runtime: python3.11
+      Architectures:
+        - arm64
+      Events:
+        GenToken:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /genToken
+            Method: post
+      Policies:
+        - AWSSecretsManagerGetSecretValuePolicy:
+            SecretArn: !Ref TokenVenderIAMUserSecret
+        - Statement:
+            - Sid: GetFederationToken
+              Effect: Allow
+              Action:
+                - ssm:GetFederationToken
+              Resource: !GetAtt TokenVenderIAMUser.Arn
+      Environment:
+        Variables:
+          SECRET_ARN: !Ref TokenVenderIAMUserSecret
+  TokenVenderIAMUser:
+    Type: AWS::IAM::User
+    Properties:
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonS3FullAccess
+      Policies:
+        - PolicyName: STSGetFederationToken
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Sid: GetFederationToken
+                Effect: Allow
+                Action:
+                  - sts:GetFederationToken
+                Resource: '*'
+
+  TokenVenderIAMUserAccessKey:
+    Type: AWS::IAM::AccessKey
+    Properties:
+      UserName: !Ref TokenVenderIAMUser
+
+  TokenVenderIAMUserSecret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name: TokenVenderIAMUserSecret
+      Description: Access keys for the TokenVenderIAMUser
+      SecretString: !Join
+        - ''
+        - - '{"AWS_ACCESS_KEY_ID":"'
+          - !Ref TokenVenderIAMUserAccessKey
+          - '","AWS_SECRET_ACCESS_KEY":"'
+          - !GetAtt TokenVenderIAMUserAccessKey.SecretAccessKey
+          - '"}'
+
+  SampleBucket:
+    Type: AWS::S3::Bucket
+
+Outputs:
+  TokenVenderIAMUserSecretArn:
+    Value: !Ref TokenVenderIAMUserSecret
+    Description: ARN of the Secrets Manager secret containing the TokenVenderIAMUser
+      access keys
+  # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
+  # Find out more about other implicit resources you can reference within SAM
+  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
+  GenTokenApi:
+    Description: API Gateway endpoint URL for Prod stage for Hello World function
+    Value: !Sub https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/genToken/
+  GenTokenFunction:
+    Description: GenTokenFunction Function ARN
+    Value: !GetAtt GenTokenFunction.Arn
+  SampleBucketName:
+    Description: GenTokenFunction Function ARN
+    Value: !Ref  SampleBucket
