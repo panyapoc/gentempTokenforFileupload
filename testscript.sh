@@ -23,6 +23,10 @@ get_credentials() {
     secret_access_key=$(echo "$response" | jq -r '.SecretAccessKey')
     session_token=$(echo "$response" | jq -r '.SessionToken')
 
+    echo $access_key_id
+    echo $secret_access_key
+    echo $session_token
+
     # Check if credentials were successfully extracted
     if [ -z "$access_key_id" ] || [ -z "$secret_access_key" ] || [ -z "$session_token" ]; then
         echo "Error: Failed to extract credentials from the API response."

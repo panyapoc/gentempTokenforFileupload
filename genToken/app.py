@@ -32,7 +32,6 @@ sts = boto3.client(
 
 # Define the Lambda handler function
 def lambda_handler(event, context):
-    
     # Grab Token from HTTP POST body
     # request_body = event.get('body')
     # pos_id = body_data.get('POS_ID')
@@ -45,12 +44,12 @@ def lambda_handler(event, context):
             'Statement': [
                 {
                     'Effect': 'Allow',
-                    'Action': '*',
+                    'Action': 's3:put',
                     'Resource': '*'
                 }
             ]
         }),
-        DurationSeconds=3600
+        DurationSeconds=3600*12
     )['Credentials']
 
     # Return the generated federated token

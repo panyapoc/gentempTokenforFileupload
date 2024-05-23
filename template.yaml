@@ -90,4 +90,4 @@ Outputs:
     Value: !GetAtt GenTokenFunction.Arn
   SampleBucketName:
     Description: GenTokenFunction Function ARN
-    Value: !Ref  SampleBucket
+    Value: !Ref SampleBucket
