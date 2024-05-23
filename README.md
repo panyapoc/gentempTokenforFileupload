@@ -143,3 +143,36 @@ namespace UploadFileToS3
 Make sure to replace `YOUR_AWS_ACCESS_KEY_ID`, `YOUR_AWS_SECRET_ACCESS_KEY`, `filePath`, `bucketName`, and `keyName` with your actual values.
 
 Note: It's generally recommended to use more secure methods for storing and managing AWS credentials, such as environment variables, AWS credential files, or AWS Identity and Access Management (IAM) roles, instead of hardcoding them in your code.
+
+
+Sure, here's a how-to usage for the `json2bash_export.sh` script:
+
+## Usage json2bash_export
+
+The `json2bash_export.sh` script is a Bash script that takes a JSON input containing AWS credentials (Access Key ID, Secret Access Key, and Session Token) and generates Bash export statements that can be used to set the corresponding environment variables.
+
+```
+./json2bash_export.sh <json_input>
+```
+
+Replace `<json_input>` with the JSON string containing the AWS credentials. The JSON input should have the following format:
+
+```json
+{
+  "AccessKeyId": "your_access_key_id",
+  "SecretAccessKey": "your_secret_access_key",
+  "SessionToken": "your_session_token",
+  "Expiration": "expiration_time_in_iso_format (optional)"
+}
+```
+
+## Example
+
+```bash
+$ sh json2bash_export.sh '{
+    "AccessKeyId": "xxxxxx",
+    "Expiration": "2024-05-23 18:56:04+00:00",
+    "SecretAccessKey": "xxxxxx",
+    "SessionToken": "xxxxxx"
+}'
+```
