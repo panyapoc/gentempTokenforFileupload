@@ -28,15 +28,6 @@ Resources:
       - AWSSecretsManagerGetSecretValuePolicy:
           SecretArn:
             Ref: TokenVenderIAMUserSecret
-      - Statement:
-        - Sid: GetFederationToken
-          Effect: Allow
-          Action:
-          - ssm:GetFederationToken
-          Resource:
-            Fn::GetAtt:
-            - TokenVenderIAMUser
-            - Arn
       Environment:
         Variables:
           SECRET_ARN:
